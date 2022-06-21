@@ -1,25 +1,31 @@
+<!-- 
+Agregar 2 filtros de búsqueda. Uno por nombre (o nombre + apellido) y otro por dni. Pensar que necesitan agregar en la instancia de Vuejs para obtener los valores de esos filtros mientras van cambiando.
+El usuario puede llenar un solo filtro o los 2 y el resultado tiene que ser excluyente.
+Funcionalidad opcional: Poner un alert de bootstrap debajo de los filtros que sólo se muestre como advertencia cuando el usuario no haya ingresado al menos 3 caracteres en alguno de los filtros
+ -->
+
 <!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Ejemplo 1</title>
+    <title>NT2 - TP2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
 
 </head>
 
-
 <div class="container-fluid mt-3" id="app">
-    <input type="text" class="form-control" v-model="criterioDeBusqueda"
-        placeholder="Ingresar un criterio de busqueda...">
+    <!-- <input type="text" class="form-control" v-model="criterioDeBusqueda" placeholder="Ingresar un criterio de busqueda..."> -->
+    <input type="text" class="form-control" v-model="criterioDeBusquedaXNom" placeholder="Filtrar por nombre...">
     <br>
-    <div class="card-deck m-0">
+    <input type="number" class="form-control" v-model="criterioDeBusquedaXDni" placeholder="Filtrar por dni...">
+    <br>
+    <div class="card-deck m-0" v-if="validador()">
         <div class="row">
-            <div class="col" v-for="persona in personasFiltradas">
+            <div class="col" v-for="persona in personasFiltradas2">
                 <div class="card mb-3">
                     <div class="card-body">
                         <h5 class="card-title">{{getNombreCompleto(persona)}}</h5>
@@ -30,7 +36,9 @@
             </div>
         </div>
     </div>
-
+    <div v-else>
+        <p class="alert alert-warning">Por favor ingresar mínimo 3 caracteres</p>
+    </div>
 </div>
 
 </html>
@@ -40,34 +48,66 @@
         el: '#app',
         data: {
             criterioDeBusqueda: '',
-            //Aquí, en este array es donde tienen que agregar su información
-            personas: [
-                {
+            criterioDeBusquedaXNom: '',
+            criterioDeBusquedaXDni: '',
+            personas: [{
                     nombre: "Daniel",
                     apellido: "Sanchez",
                     correo: "danielsanchez68@hotmail.com",
                     dni: "20442873"
+                }, {
+                    nombre: "Daniel",
+                    apellido: "Perez",
+                    correo: "jperez@gmail.com",
+                    dni: "12345678"
+                }, {
+                    nombre: "Alicia",
+                    apellido: "Martinez",
+                    correo: "aperez@gmail.com",
+                    dni: "98765432"
+                }, {
+                    nombre: "Marino",
+                    apellido: "Gomez",
+                    correo: "mgomez@gmail.com",
+                    dni: "456443278"
+                }, {
+                    nombre: "Anita",
+                    apellido: "Martin",
+                    correo: "anita@yahoo.com",
+                    dni: "90876544"
                 },
-                {
-                    nombre: "...",
-                    apellido: "...",
-                    correo: "...",
-                    dni: "..."
-                },
-            ]
 
+            ]
         },
         computed: {
-            personasFiltradas() {
+            // Busca por cualquier dato en nombre, apellido, dni y mail
+            /*  personasFiltradas() {
+                 return this.personas.filter((persona) => {
+                     let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`
+                     return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase())
+                 });
+             }, */
+
+            personasFiltradas2() {
                 return this.personas.filter((persona) => {
-                    let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`
-                    return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase())
-                });
-            }
+                    let nombre = `${persona.nombre}`
+                    return nombre.toLowerCase().includes(this.criterioDeBusquedaXNom.toLowerCase())
+                }).filter((persona) => {
+                    let dni = `${persona.dni}`
+                    return dni.includes(this.criterioDeBusquedaXDni)
+                })
+            },
         },
         methods: {
             getNombreCompleto(persona) {
                 return `${persona.nombre} ${persona.apellido}`
+            },
+            validador() {
+                let datos = false;
+                if ((this.criterioDeBusquedaXNom.length >= 3) || (this.criterioDeBusquedaXDni.length >= 3)) {
+                    datos = true;
+                }
+                return datos;
             }
         }
     });
